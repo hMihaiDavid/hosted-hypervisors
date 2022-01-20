@@ -1,0 +1,32 @@
+WIP
+
+This initial draft enters vmx non-root operation and exits.
+It does the required vmxon and vmcs setup. It only works on uniproc
+hosts for now. We should disable interrupts during vmx non-root operation
+or they will not be passed to the host, even tho they produce vm exits.
+In a later iteration we will do host interrupt emulation.
+
+When the first draft is complete we will properly document it and explain
+in more detail and in an orderly manner what we're trying to accomplish,
+basically we're trying to write a hypervisor in several iterations,
+each one incrementally building on the previous one.
+
+The steps will be properly documented, for now the next step is to be
+able for a thread to re-enter on a vmcs, it should the same thread that first run it.
+
+Later, we should make sure runs on smp host, following should be done:
+ - Allocate a VMXON region for each logical processor.
+ - Migrate the VMCS to the VMXON of a different logical processor before
+ reentering in case the scheduler has run the thread on a different LP.
+ - Disable preemption from the point where we start writting host state
+   into the state area up until vm exit, since if the kernel is preempted
+   in the middle of writting host-state area and some of the
+   state is LP-dependent (it is, like the TSR) we can corrupt the host on exit.
+
+After that, the next phase should implement host-interrupt passthrough (kvm calls it emulation),
+since when a host interrupt happens, it produces a vm exit and it is our responsibility
+to call the host interrupt handling code.
+
+Later, we should virtualize guest memory using EPT, for now the guest has
+paging disabled and sees the host physical memory directly.
+

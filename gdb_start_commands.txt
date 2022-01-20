@@ -1,0 +1,16 @@
+add-auto-load-safe-path /home/user/mvm/buildroot-2021.02.8/output/build/linux-5.10.7
+add-auto-load-safe-path /home/user/mvm/mvm_hv_vmx64"
+file vmlinux
+set arch i386:x86-64:intel
+target remote localhost:1234
+hbreak start_kernel
+continue
+delete
+disconnect
+set arch i386:x86-64
+target remote localhost:1234
+hb *0xffffffffc0000b43
+commands
+lx-symbols /home/user/mvm/mvm_hv_vmx64
+bt
+end
